@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Direct connection (e.g. Supabase port 5432). Prisma Migrate uses this; pooled `DATABASE_URL` is for runtime queries.
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  timezone     String      @default("UTC")
+  eventTypes   EventType[]
+  availabilities Availability[]
+  bookings     Booking[]   @relation("HostBookings")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model EventType {
+  id            String         @id @default(cuid())
+  userId        String
+  title         String
+  description   String?
+  duration      Int
+  slug          String         @unique
+  bufferTime    Int            @default(0)
+  questions     Json?
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+  dateOverrides DateOverride[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  userId    String
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  timezone  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, dayOfWeek, startTime, endTime])
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  eventTypeId     String
+  hostId          String
+  startTime       DateTime
+  endTime         DateTime
+  attendeeName    String
+  attendeeEmail   String
+  status          String   @default("CONFIRMED")
+  rescheduleToken String   @unique
+  eventType       EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  host            User      @relation("HostBookings", fields: [hostId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([eventTypeId, startTime, endTime])
+}
+
+model DateOverride {
+  id          String   @id @default(cuid())
+  eventTypeId String
+  date        DateTime
+  isBlocked   Boolean  @default(false)
+  startTime   String?
+  endTime     String?
+  eventType   EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([eventTypeId, date])
+}
