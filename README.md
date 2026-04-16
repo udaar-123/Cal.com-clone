@@ -89,6 +89,44 @@ npm run dev
 
 Frontend runs on `http://localhost:5173`.
 
+## Deploy (Vercel + Render)
+
+This setup gives you one shareable frontend link (Vercel) while Render hosts the API.
+
+### 1) Deploy backend (`server/`) to Render
+
+1. Push the repo to GitHub.
+2. In Render, create a new **Web Service** from the repo and set **Root Directory** to `server`.
+3. Add environment variables:
+   - `DATABASE_URL`
+   - `DIRECT_URL`
+   - `PORT=4000`
+   - `APP_URL` (your Vercel domain once available)
+   - optional SMTP vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`)
+4. Build command: `npm install && npm run prisma:generate`
+5. Pre-Deploy command: `npm run prisma:deploy`
+6. Start command: `npm run start`
+7. Run seed only once (Render shell): `npm run prisma:seed`
+
+> Do not put `npm run prisma:seed` in Pre-Deploy with the current seed script. It deletes existing rows before recreating demo data.
+
+Save your Render public URL, for example: `https://your-api.onrender.com`.
+
+### 2) Deploy frontend (`client/`) to Vercel
+
+1. In Vercel, import the same GitHub repo and set **Root Directory** to `client`.
+2. Add environment variable:
+   - `VITE_API_BASE_URL=https://your-api.onrender.com`
+3. Deploy.
+
+Your manager will use only the Vercel link:
+`https://your-app.vercel.app`
+
+### 3) Local vs production API behavior
+
+- Local dev: keep `VITE_API_BASE_URL` empty and Vite proxy handles `/api`.
+- Production: set `VITE_API_BASE_URL` so frontend calls Render directly.
+
 ### Optional: Supabase Agent Skills (AI tooling)
 
 If you use Cursor Agent Skills for Supabase workflows:

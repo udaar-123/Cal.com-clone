@@ -3,6 +3,18 @@ import { api } from "../api";
 import { useDefaultUser } from "../hooks/useDefaultUser";
 
 const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const timezoneOptions = [
+  "UTC",
+  "Asia/Kolkata",
+  "Asia/Dubai",
+  "Asia/Singapore",
+  "Europe/London",
+  "Europe/Berlin",
+  "America/New_York",
+  "America/Chicago",
+  "America/Los_Angeles",
+  "Australia/Sydney",
+];
 
 export default function AvailabilityPage() {
   const { user, error: userError } = useDefaultUser();
@@ -56,6 +68,10 @@ export default function AvailabilityPage() {
     setSlots((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function updateTimezone(index, timezone) {
+    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, timezone } : slot)));
+  }
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Availability</h1>
@@ -86,11 +102,34 @@ export default function AvailabilityPage() {
               value={slot.endTime}
               onChange={(e) => setSlots((prev) => prev.map((s, i) => (i === index ? { ...s, endTime: e.target.value } : s)))}
             />
-            <input
-              className="rounded-lg border border-slate-200 px-3 py-3 text-sm"
-              value={slot.timezone}
-              onChange={(e) => setSlots((prev) => prev.map((s, i) => (i === index ? { ...s, timezone: e.target.value } : s)))}
-            />
+            <div className="space-y-2">
+              <select
+                className="w-full rounded-lg border border-slate-200 px-3 py-3 text-sm"
+                value={timezoneOptions.includes(slot.timezone) ? slot.timezone : "__custom__"}
+                onChange={(e) => {
+                  if (e.target.value === "__custom__") {
+                    updateTimezone(index, "");
+                    return;
+                  }
+                  updateTimezone(index, e.target.value);
+                }}
+              >
+                {timezoneOptions.map((tz) => (
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
+                ))}
+                <option value="__custom__">Custom timezone...</option>
+              </select>
+              {!timezoneOptions.includes(slot.timezone) && (
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Type timezone e.g. Asia/Kathmandu"
+                  value={slot.timezone}
+                  onChange={(e) => updateTimezone(index, e.target.value)}
+                />
+              )}
+            </div>
             <button
               type="button"
               className="rounded-lg bg-rose-50 px-3 py-3 text-sm font-medium text-rose-700 hover:bg-rose-100"

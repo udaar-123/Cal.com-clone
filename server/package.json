@@ -7,11 +7,11 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "prisma:generate": "dotenv -c -- prisma generate",
-    "prisma:migrate": "dotenv -c -- prisma migrate dev",
-    "prisma:deploy": "dotenv -c -- prisma migrate deploy",
-    "prisma:push": "dotenv -c -- prisma db push",
-    "prisma:seed": "dotenv -c -- node prisma/seed.js"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "node prisma/seed.js"
   },
   "keywords": [
     "scheduling",
@@ -32,7 +32,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "dotenv-cli": "^11.0.0",
     "nodemon": "^3.1.14",
     "prisma": "6.19.3"
   }
