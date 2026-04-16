@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Scheduling backend API",
   "type": "module",
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
