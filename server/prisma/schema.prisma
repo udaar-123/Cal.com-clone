@@ -6,7 +6,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   // Direct connection (e.g. Supabase port 5432). Prisma Migrate uses this; pooled `DATABASE_URL` is for runtime queries.
-  directUrl = env("DIRECT_URL")
+ // directUrl = env("DIRECT_URL")
 }
 
 model User {
